@@ -119,7 +119,6 @@ class NaturalGasDataFetcher:
     def get_weather_data(self, city="Chicago", days_back=365 * 4):
         """
         Get basic weather data (temperature) for heating degree days calculation
-        Note: This is a simplified version. For production, use dedicated weather APIs
         """
         print("Note: Using simplified weather data generation")
         print("For production, consider using OpenWeatherMap API or NOAA data")
@@ -232,15 +231,9 @@ class NaturalGasDataFetcher:
 
 # Usage example:
 if __name__ == "__main__":
-    # Initialize fetcher (add your EIA API key)
+    # Initialize fetcher
     fetcher = NaturalGasDataFetcher(eia_api_key="oFFfwEonZjh6oENLFfK0XBHeH7nUUcCb0YJh0LJx")
 
-    # Option 1: Get individual datasets
-    # prices = fetcher.get_henry_hub_prices()
-    # storage = fetcher.get_storage_data()
-    # weather = fetcher.get_weather_data()
-
-    # Option 2: Get combined dataset (recommended)
     data = fetcher.combine_all_data()
 
     if data is not None:
