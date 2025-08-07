@@ -1,4 +1,3 @@
-
 import pandas as pd
 import requests
 import yfinance as yf
@@ -147,9 +146,28 @@ class NaturalGasDataFetcher:
 
         return weather_df
 
-    def combine_all_data(self):
+    def _clean_dataframe_for_merge(self, df):
+        """
+        Ensure DataFrame has clean single-level index and columns for merging
+        """
+        # Reset any MultiIndex on rows
+        if hasattr(df.index, 'nlevels') and df.index.nlevels > 1:
+            df = df.reset_index()
+
+        # Flatten any MultiIndex columns
+        if hasattr(df.columns, 'nlevels') and df.columns.nlevels > 1:
+            df.columns = ['_'.join(map(str, col)).strip('_') if isinstance(col, tuple) else str(col)
+                          for col in df.columns.values]
+
+        return df.reset_index(drop=True)
+
+    def combine_all_data(self, save_to_csv=False, csv_path=None):
         """
         Fetch and combine all datasets
+
+        Parameters:
+        - save_to_csv: Boolean, whether to save data to CSV
+        - csv_path: String, path where to save CSV file
         """
         print("Fetching all natural gas data...")
 
@@ -164,32 +182,80 @@ class NaturalGasDataFetcher:
         # Get weather data
         weather = self.get_weather_data()
 
-        # Merge datasets
-        if prices is not None and storage is not None:
-            # Convert to weekly data for consistency
-            prices['week'] = prices['date'].dt.to_period('W')
-            storage['week'] = storage['date'].dt.to_period('W')
-            weather['week'] = weather['date'].dt.to_period('W')
+        # Always create a dataset, even if some sources fail
+        combined = None
 
-            # Aggregate to weekly
-            weekly_prices = prices.groupby('week')['henry_hub_price'].mean().reset_index()
+        # Start with prices (most reliable)
+        if prices is not None:
+            # Create week periods and convert to start of week dates
+            prices['week_period'] = prices['date'].dt.to_period('W')
+            prices['week'] = prices['week_period'].dt.start_time
+            combined = prices.groupby('week')['henry_hub_price'].mean().reset_index()
+            combined = combined.rename(columns={'week': 'date'})
+
+            # Ensure clean DataFrame
+            combined = self._clean_dataframe_for_merge(combined)
+            print(f"Base dataset: {len(combined)} price records")
+
+        # Add storage if available
+        if storage is not None and combined is not None:
+            storage['week_period'] = storage['date'].dt.to_period('W')
+            storage['week'] = storage['week_period'].dt.start_time
             weekly_storage = storage.groupby('week')['storage_level'].last().reset_index()
-            weekly_weather = weather.groupby('week')[['hdd', 'cdd']].sum().reset_index()
+            weekly_storage = self._clean_dataframe_for_merge(weekly_storage)
 
-            # Merge all data
-            combined = weekly_prices.merge(weekly_storage, on='week', how='inner')
-            combined = combined.merge(weekly_weather, on='week', how='left')
-
-            # Convert week back to date
-            combined['date'] = combined['week'].dt.start_time
+            combined = combined.merge(weekly_storage, left_on='date', right_on='week', how='left',
+                                      suffixes=('', '_storage'))
             combined = combined.drop('week', axis=1)
+            combined = self._clean_dataframe_for_merge(combined)
+            print("Added storage data")
+        else:
+            # Use demo storage data
+            print("Generating demo storage data...")
+            demo_storage = self._generate_demo_data()
+            if demo_storage is not None and combined is not None:
+                demo_storage['week_period'] = demo_storage['date'].dt.to_period('W')
+                demo_storage['week'] = demo_storage['week_period'].dt.start_time
+                weekly_demo = demo_storage.groupby('week')['storage_level'].last().reset_index()
+                weekly_demo = self._clean_dataframe_for_merge(weekly_demo)
+
+                combined = combined.merge(weekly_demo, left_on='date', right_on='week', how='left',
+                                          suffixes=('', '_storage'))
+                combined = combined.drop('week', axis=1)
+                combined = self._clean_dataframe_for_merge(combined)
+                print("Added demo storage data")
+
+        # Add weather data
+        if weather is not None and combined is not None:
+            weather['week_period'] = weather['date'].dt.to_period('W')
+            weather['week'] = weather['week_period'].dt.start_time
+            weekly_weather = weather.groupby('week')[['hdd', 'cdd']].sum().reset_index()
+            weekly_weather = self._clean_dataframe_for_merge(weekly_weather)
+
+            combined = combined.merge(weekly_weather, left_on='date', right_on='week', how='left',
+                                      suffixes=('', '_weather'))
+            combined = combined.drop('week', axis=1)
+            combined = self._clean_dataframe_for_merge(combined)
+            print("Added weather data")
+
+        if combined is not None:
+            # Clean up and finalize
             combined = combined.sort_values('date').reset_index(drop=True)
 
-            print(f"Combined dataset has {len(combined)} weekly records")
+            print(f"Final dataset: {len(combined)} weekly records")
             print(f"Date range: {combined['date'].min()} to {combined['date'].max()}")
+            print(f"Columns: {list(combined.columns)}")
+
+            # Always save to CSV if requested
+            if save_to_csv:
+                if csv_path is None:
+                    csv_path = '../data/natural_gas_data.csv'
+                combined.to_csv(csv_path, index=False)
+                print(f"Data saved to '{csv_path}'")
 
             return combined
 
+        print("Failed to create any dataset")
         return None
 
     def _generate_demo_data(self):
@@ -231,17 +297,17 @@ class NaturalGasDataFetcher:
 
 # Usage example:
 if __name__ == "__main__":
-    # Initialize fetcher
+    # Initialize fetcher (add your EIA API key)
     fetcher = NaturalGasDataFetcher(eia_api_key="oFFfwEonZjh6oENLFfK0XBHeH7nUUcCb0YJh0LJx")
 
-    data = fetcher.combine_all_data()
+    # Get combined dataset and always save it
+    data = fetcher.combine_all_data(save_to_csv=True, csv_path='../data/natural_gas_data.csv')
 
     if data is not None:
         print("\nDataset overview:")
         print(data.head())
         print(f"\nColumns: {list(data.columns)}")
         print(f"Shape: {data.shape}")
-
-        # Save to CSV for easy access
-        data.to_csv('natural_gas_data.csv', index=False)
-        print("\nData saved to 'natural_gas_data.csv'")
+        print("\nData successfully saved to 'natural_gas_data.csv'")
+    else:
+        print("\nFailed to create dataset")

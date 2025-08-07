@@ -10,6 +10,6 @@ Time series forecasting project using ARIMA/SARIMA models to predict natural gas
 - EIA API for real market data
 
 ## Project Structure
-- `src/`: Python source code
+- `utils/`: Python source code
 - `notebooks/`: Data analysis and modeling
 - `data/`: Raw and processed datasets
