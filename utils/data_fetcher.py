@@ -249,7 +249,7 @@ class NaturalGasDataFetcher:
             # Always save to CSV if requested
             if save_to_csv:
                 if csv_path is None:
-                    csv_path = '../data/natural_gas_data.csv'
+                    csv_path = '../data/raw_natural_gas_data.csv'
                 combined.to_csv(csv_path, index=False)
                 print(f"Data saved to '{csv_path}'")
 
@@ -301,7 +301,7 @@ if __name__ == "__main__":
     fetcher = NaturalGasDataFetcher(eia_api_key="oFFfwEonZjh6oENLFfK0XBHeH7nUUcCb0YJh0LJx")
 
     # Get combined dataset and always save it
-    data = fetcher.combine_all_data(save_to_csv=True, csv_path='../data/natural_gas_data.csv')
+    data = fetcher.combine_all_data(save_to_csv=True, csv_path='../data/raw_natural_gas_data.csv')
 
     if data is not None:
         print("\nDataset overview:")
