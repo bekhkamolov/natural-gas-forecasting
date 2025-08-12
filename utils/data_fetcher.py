@@ -249,7 +249,7 @@ class NaturalGasDataFetcher:
             # Always save to CSV if requested
             if save_to_csv:
                 if csv_path is None:
-                    csv_path = '../data/raw_natural_gas_data.csv'
+                    csv_path = '../data/raw_natural_gas_data.csv'git
                 combined.to_csv(csv_path, index=False)
                 print(f"Data saved to '{csv_path}'")
 
