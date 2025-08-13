@@ -82,7 +82,7 @@ This Jupyter notebook, _[model_implementations.ipynb](https://github.com/bekhkam
   - MAE: 0.0881
 - **Key Findings**: Random walk model effectively captured the unpredictable nature of gas price changes
 
-![ARIMA Model Predictions](images/ARIMA Model Forecast vs Actual Prices.png)
+![ARIMA Model Predictions](images/arima_model_forecast.png)
 ### SARIMA Analysis
 - **Automated Parameter Detection**: Used `pmdarima.auto_arima()` for optimal seasonal parameter selection
 - **Seasonal Decomposition**: Analyzed multiplicative seasonal patterns in original price series
@@ -94,7 +94,7 @@ This Jupyter notebook, _[model_implementations.ipynb](https://github.com/bekhkam
   - MAE: 0.3888 
 - **Results**: Compared seasonal vs non-seasonal model performance
 
-![SARIMA Model Predictions](images/SARIMA Model Forecast vs Actual Prices.png)  
+![SARIMA Model Predictions](images/sarima_model_forecast.png)  
 
 ### Feature Engineering (XGBoost)
 - **Lag Features**: Historical price differences as predictors
@@ -102,7 +102,7 @@ This Jupyter notebook, _[model_implementations.ipynb](https://github.com/bekhkam
 - **Weather Variables**: Temperature, HDD, and CDD integration
 - **Time-based Features**: Seasonal and trend components
 
-![XGBoost Feature Importance](images/XGBoost Feature Importance.png)
+![XGBoost Feature Importance](images/xgboost_feature_importance.png)
 
 ### Model Evaluation
 - **Train/Test Split**: 80-20 temporal split maintaining time series structure
@@ -112,7 +112,7 @@ This Jupyter notebook, _[model_implementations.ipynb](https://github.com/bekhkam
   - RMSE: 0.1648
   - MAE: 0.1232
 
-![XGBoost Model Predictions](images/XGBoost Model Predictions vs Actual Prices.png)
+![XGBoost Model Predictions](images/xgboost_model_forecast.png)
 ### Key Insights
 - ARIMA and SARIMA models: Initial statistical modeling confirmed that the gas price series followed a random walk pattern, with seasonal components revealed by the SARIMA model.
 - Automated model selection: The use of automated tools like pmdarima.auto_arima helped in identifying optimal model parameters and reducing the risk of overfitting
