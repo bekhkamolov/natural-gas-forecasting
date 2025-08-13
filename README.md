@@ -1,18 +1,22 @@
 # Natural Gas Price Forecasting
 
 ## Overview
-Time series forecasting project using ARIMA/SARIMA models to predict natural gas prices based on fundamental market data including storage levels and weather patterns.
+Time series forecasting project using ARIMA/SARIMA and XGBoost models to predict natural gas prices based on fundamental market data including weather patterns.
 
 ## Technologies Used
-- Python
-- ARIMA/SARIMA models
-- XGBoost for comparison
-- EIA API for real market data
+- **Python**: The core programming language used for all data analysis and model implementation
+- **Jupyter Notebook**: The development environment used for conducting the analysis, visualizing results, and presenting the final models
+- **Time Series Models**:
+  - **ARIMA/SARIMA**: Implemented using statsmodels and pmdarima for traditional statistical forecasting
+  - **XGBoost**: A machine learning model used to compare against the statistical models, demonstrating a feature-based forecasting approach
+- **Data Source**:
+  - **EIA API**: Used to retrieve real-world natural gas price data for the analysis
 
 ## Project Structure
 - `utils/`: Python source code
 - `notebooks/`: Data analysis and modeling
 - `data/`: Raw and processed datasets
+- `images/`: Visualizations from notebooks
 
 ## Notebooks
 _[Data Preprocessing](https://github.com/bekhkamolov/natural-gas-forecasting/blob/main/notebooks/data_preprocessing.ipynb)_ notebook prepares and cleans the raw datasets for further time series modeling (ARIMA, SARIMA, XGBoost). It:
