@@ -15,7 +15,7 @@ Time series forecasting project using ARIMA/SARIMA models to predict natural gas
 - `data/`: Raw and processed datasets
 
 ## Notebooks
-_[data_preprocessing](https://github.com/bekhkamolov/natural-gas-forecasting/blob/main/notebooks/data_preprocessing.ipynb)_ notebook prepares and cleans the raw datasets for further time series modeling (ARIMA, SARIMA, ARIMAX). It:
+_[Data Preprocessing](https://github.com/bekhkamolov/natural-gas-forecasting/blob/main/notebooks/data_preprocessing.ipynb)_ notebook prepares and cleans the raw datasets for further time series modeling (ARIMA, SARIMA, XGBoost). It:
 
 * Loads Henry Hub price data and weather data (temperature, HDD, CDD) from our created packages
 * Flattens multi-index column headers
@@ -30,8 +30,8 @@ Example output:
 | 2020-01-02 | 2.122 | 45.3        | 5.0 | 0.0 |
 | 2020-01-03 | 2.130 | 44.8        | 6.2 | 0.0 |
 
-## Exploratory Data Analysis ([EDA](https://github.com/bekhkamolov/natural-gas-forecasting/blob/main/notebooks/exploratory_data_analysis.ipynb))
-
+## Exploratory Data Analysis (EDA)
+This _[notebook](https://github.com/bekhkamolov/natural-gas-forecasting/blob/main/notebooks/exploratory_data_analysis.ipynb)_ consists of exploratory analysis using visualizations like trend plots and seasonal decomposition to understand the data's characteristics
 ### Data Overview
 - **Henry Hub Natural Gas Prices**: Daily prices from July 2021 to July 2025
 - **Temperature Data**: Daily average temperatures with clear seasonal patterns
@@ -60,8 +60,8 @@ Example output:
 - PACF suggests starting with AR(1) or AR(2) models
 - Weather variables available for multivariate approaches
 
-## [Model Implementations](https://github.com/bekhkamolov/natural-gas-forecasting/blob/main/notebooks/model_implementations.ipynb)
-
+## Model Implementations
+This Jupyter notebook, _[model_implementations.ipynb](https://github.com/bekhkamolov/natural-gas-forecasting/blob/main/notebooks/model_implementations.ipynb)_ explores various time series models for forecasting natural gas prices
 ### Models Tested
 - **ARIMA Models**: Manual configuration and random walk model based on EDA insights
 - **SARIMA Models**: Automated parameter detection using pmdarima
@@ -78,12 +78,19 @@ Example output:
   - MAE: 0.0881
 - **Key Findings**: Random walk model effectively captured the unpredictable nature of gas price changes
 
+![ARIMA Model Predictions](images/ARIMA Model Forecast vs Actual Prices.png)
 ### SARIMA Analysis
 - **Automated Parameter Detection**: Used `pmdarima.auto_arima()` for optimal seasonal parameter selection
 - **Seasonal Decomposition**: Analyzed multiplicative seasonal patterns in original price series
 - **Model Selection**: Automatic detection of best SARIMA(p,d,q)(P,D,Q,s) configuration
 - **Seasonal Periods**: Algorithm tested different seasonal frequencies automatically
+- **Performance Metrics**:
+  - MSE: 0.1987
+  - RMSE: 0.4457
+  - MAE: 0.3888 
 - **Results**: Compared seasonal vs non-seasonal model performance
+
+![SARIMA Model Predictions](images/SARIMA Model Forecast vs Actual Prices.png)  
 
 ### Feature Engineering (XGBoost)
 - **Lag Features**: Historical price differences as predictors
@@ -91,14 +98,20 @@ Example output:
 - **Weather Variables**: Temperature, HDD, and CDD integration
 - **Time-based Features**: Seasonal and trend components
 
+![XGBoost Feature Importance](images/XGBoost Feature Importance.png)
+
 ### Model Evaluation
 - **Train/Test Split**: 80-20 temporal split maintaining time series structure
-- **Automated Selection**: Used statistical criteria (AIC/BIC) for model comparison
-- **Metrics**: MSE, RMSE, and MAE for comprehensive performance assessment
+- **Automated Selection**: Used statistical criteria (AIC) for model comparison
+- **Performance Metrics**:
+  - MSE: 0.0272
+  - RMSE: 0.1648
+  - MAE: 0.1232
 
+![XGBoost Model Predictions](images/XGBoost Model Predictions vs Actual Prices.png)
 ### Key Insights
-- Auto ARIMA efficiently identified optimal parameters
-- SARIMA modeling revealed seasonal components in gas price data
-- Feature engineering improved XGBoost performance significantly
-- Weather variables showed limited linear relationship but potential for non-linear modeling
-- Automated model selection reduced overfitting risks
+- ARIMA and SARIMA models: Initial statistical modeling confirmed that the gas price series followed a random walk pattern, with seasonal components revealed by the SARIMA model.
+- Automated model selection: The use of automated tools like pmdarima.auto_arima helped in identifying optimal model parameters and reducing the risk of overfitting
+- XGBoost outperformed other models: The machine learning approach using XGBoost proved to be the most effective forecasting model. Its ability to capture complex, non-linear relationships and price volatility surpassed the traditional ARIMA and SARIMA models.
+- Feature engineering was crucial: The creation of lagged price and weather variables, along with time-based features, significantly improved the XGBoost model's predictive performance.
+- Weather variable insights: While statistical models showed a limited linear relationship with weather variables, their inclusion in the XGBoost model demonstrated their value for capturing non-linear patterns.
